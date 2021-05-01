@@ -6,9 +6,9 @@ subplot(2,1,1)
 %Blank Series created and plot
 
 graph.plot;
-%Axis Buttons
-graph.xData = uicontrol('style', 'edit','units','normalized','position',[.05,.4,.15,.05],'string','');
-graph.yData= uicontrol('style', 'edit','units','normalized','position',[.22,.4,.15,.05],'string','');
+%Series Buttons
+graph.xData = uicontrol('style', 'edit','units','normalized','position',[.05,.41,.15,.04],'string','');
+graph.yData= uicontrol('style', 'edit','units','normalized','position',[.22,.41,.15,.04],'string','');
 graph.xTitleText= uicontrol('style', 'text','units','normalized','position',[.05,.45,.15,.05],'string','X Series');
 graph.yTitleText= uicontrol('style', 'text','units','normalized','position',[.22,.45,.15,.05],'string','Y Series');
 graph.plot;
@@ -54,6 +54,14 @@ graph.lines(3) = uicontrol(graph.lineBg,'style','radiobutton','units','normalize
 graph.lines(4) = uicontrol(graph.lineBg,'style','radiobutton','units','normalized','position',[.2,.22,1,.1],'string','Dashed');
 graph.lines(5) = uicontrol(graph.lineBg,'style','radiobutton','units','normalized','position',[.2,.005,1,.1],'string','No line');
 
+%Axis Titles
+graph.xAxis = uicontrol('style','edit','units','normalized','position',[.05,.3,.15,.04],'string','');
+graph.xAxisTitle= uicontrol('style', 'text','units','normalized','position',[.05,.34,.15,.05],'string','X Axis Label');
+graph.yAxis = uicontrol('style','edit','units','normalized','position',[.22,.3,.15,.04],'string','');
+graph.yAxisTitle= uicontrol('style', 'text','units','normalized','position',[.22,.34,.15,.05],'string','Y Axis Label');
+graph.title = uicontrol('style','edit','units','normalized','position',[.39,.3,.15,.04],'string','');
+graph.titleTitle= uicontrol('style', 'text','units','normalized','position',[.39,.34,.15,.05],'string','Title');
+
 %Call Reset
 ResetPlot();
 end
@@ -62,41 +70,53 @@ end
 %Resets entire plot to default
 function[]=ResetPlot(source, event)
 hold off;
-Plot(0,0,'k');
+Plot(0,0,'');
 xlabel('X Axis');
 ylabel('Y Axis');
 title('Graph Title');
-ResetPlotAxis();
-end
-
-%Resets only the axis series leaving all lables and titles intact
-function[]=ResetPlotAxis(source,event)
-global graph;
+xlim([-10 10]);
+ylim([-10 10]);
 hold on;
-graph.xData = uicontrol('style', 'edit','units','normalized','position',[.05,.4,.15,.05],'string','');
-graph.yData= uicontrol('style', 'edit','units','normalized','position',[.22,.4,.15,.05],'string','');
 end
 
 %Plot Function takes series inputs
 function [] = Plot (xSeries,ySeries,style)
 global graph;
 graph.plot = plot(xSeries,ySeries,style);
+    if(length(graph.xAxis.String)>0)
+        xlabel(graph.xAxis.String);
+    else
+        xlabel('X Axis');
+    end
+    if(length(graph.yAxis.String)>0)
+        ylabel(graph.yAxis.String);
+    else
+        ylabel('Y Axis');
+    end
+    if(length(graph.title.String)>0)
+        title(graph.title.String);
+    else
+        title('Title');
+    end
+
+
 end
 
 %Calls Plot if user input is plottable
 function [] = PlotFromUser (source,event)
 global graph;
-if (length(regexp(graph.xData.String,'[a-b]?+[A-B]?+','match'))<1 && length(regexp(graph.yData.String,'[a-b]?+[A-B]?+','match'))<1)
-    x=str2num(graph.xData.String);
-    y=str2num(graph.yData.String);
-        if length(x) == length(y)
-            Plot(x,y,StyleMaker());
-        else
-            msgbox('X and Y Series do not have the same number of values','Unable To Plot','error','modal');
-        end
-else
-    msgbox('Invalid Input. Input must be numbers seperated by only a space','Unable To Plot','error','modal');
-end
+    if (length(regexp(graph.xData.String,'[a-b]?+[A-B]?+','match'))<1 && length(regexp(graph.yData.String,'[a-b]?+[A-B]?+','match'))<1)
+        x=str2num(graph.xData.String);
+        y=str2num(graph.yData.String);
+            if length(x) == length(y)
+                Plot(x,y,StyleMaker());
+            else
+                msgbox('X and Y Series do not have the same number of values','Unable To Plot','error','modal');
+            end
+    else
+        msgbox('Invalid Input. Input must be numbers seperated by only a space','Unable To Plot','error','modal');
+    end
+    
 end
 
 %Creates a style string using 3 maker functions which read radio buttons
