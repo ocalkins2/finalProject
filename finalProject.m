@@ -12,9 +12,8 @@ graph.yData= uicontrol('style', 'edit','units','normalized','position',[.22,.41,
 graph.xTitleText= uicontrol('style', 'text','units','normalized','position',[.05,.45,.15,.05],'string','X Series');
 graph.yTitleText= uicontrol('style', 'text','units','normalized','position',[.22,.45,.15,.05],'string','Y Series');
 graph.plot;
-graph.resetAxisButton=uicontrol('style','pushbutton','units','normalized','position',[.034 .007 .14 .05],'string','Reset Series','callback',{@ResetPlotAxis});
-graph.resetPlotButton=uicontrol('style','pushbutton','units','normalized','position',[.034 .107 .14 .05],'string','Reset ALL','callback',{@ResetPlot});
-graph.PlotButton=uicontrol('style','pushbutton','units','normalized','position',[.034 .207 .14 .05],'string','Plot','callback',{@PlotFromUser});
+graph.resetPlotButton=uicontrol('style','pushbutton','units','normalized','position',[.05 .007 .15 .05],'string','Reset ALL','callback',{@ResetPlot});
+graph.PlotButton=uicontrol('style','pushbutton','units','normalized','position',[.22 .007 .15 .05],'string','Plot','callback',{@PlotFromUser});
 
 %Style buttons
 graph.colorText= uicontrol('style', 'text','units','normalized','position',[.6,.45,.08,.05],'string','Plot Color');
@@ -62,6 +61,12 @@ graph.yAxisTitle= uicontrol('style', 'text','units','normalized','position',[.22
 graph.title = uicontrol('style','edit','units','normalized','position',[.39,.3,.15,.04],'string','');
 graph.titleTitle= uicontrol('style', 'text','units','normalized','position',[.39,.34,.15,.05],'string','Title');
 
+%Axis Limits
+graph.xLimTitle = uicontrol('style', 'text','units','normalized','position',[.05,.25,.15,.05],'string','X Axis Limits');
+graph.xLim = uicontrol('style','edit','units','normalized','position',[.05,.21,.15,.04],'string','');
+graph.yLimTitle = uicontrol('style', 'text','units','normalized','position',[.22,.25,.15,.05],'string','Y Axis Limits');
+graph.yLim = uicontrol('style','edit','units','normalized','position',[.22,.21,.15,.04],'string','');
+
 %Call Reset
 ResetPlot();
 end
@@ -82,6 +87,7 @@ end
 %Plot Function takes series inputs
 function [] = Plot (xSeries,ySeries,style)
 global graph;
+%Axis and Title conditionals
 graph.plot = plot(xSeries,ySeries,style);
     if(length(graph.xAxis.String)>0)
         xlabel(graph.xAxis.String);
@@ -98,7 +104,34 @@ graph.plot = plot(xSeries,ySeries,style);
     else
         title('Title');
     end
+%Limit conditional
+xLim=str2num(graph.xLim.String);
+yLim=str2num(graph.yLim.String);
+if (~isempty(graph.xLim.String))
+    if(regexp(graph.xLim.String,'^([?)(-?)([0-9]+\s(-?)[0-9]+)(]?)')==1)
+        if(xLim(1)<xLim(2))
+        xlim(str2num(graph.xLim.String));
+        else
+            msgbox('Axis Limits should be two increasing numbers seperated by a space','Unable To Plot','error','modal');
+        end
+    else
+         msgbox('Axis Limits should be two increasing numbers seperated by a space','Unable To Plot','error','modal');
+    end
+end
 
+if(~isempty(graph.yLim.String))
+    if(regexp(graph.yLim.String,'^([?)(-?)([0-9]+\s(-?)[0-9]+)(]?)')==1)
+        if(yLim(1)<yLim(2))
+        ylim(str2num(graph.yLim.String));
+        else
+            msgbox('Axis Limits should be two increasing numbers seperated by a space','Unable To Plot','error','modal');
+        end
+    else
+        msgbox('Axis Limits should be two increasing numbers seperated by a space','Unable To Plot','error','modal');
+    end
+end
+    
+    
 
 end
 
@@ -184,5 +217,7 @@ global graph;
         l='-.';
     elseif strcmp(get(graph.lineBg,'SelectedObject').String,'Dashed')
         l='--';
+    else
+        l='';
     end
 end
